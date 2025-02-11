@@ -1,22 +1,35 @@
 ---
-
-- hosts: all
+- name: Update web servers
+  hosts: webservers
   become: true
+
   tasks:
-
-    - name: update repository index
-      apt:
-        update_cache: yes
-      when: ansible_distribution == "Ubuntu"
-
-    - name: install apache package
-      apt:
+    - name: Ensure apache is at the latest version
+      ansible.builtin.apt:
         name: apache2
         state: latest
-      when: ansible_distribution == "Ubuntu"
+        update_cache: yes
 
-    - name: add php support for apache
-      apt:
-        name: libapache2_mod_php
+    - name: Ensure Apache is started and enabled on boot
+      ansible.builtin.service:
+        name: apache2
+        state: started
+        enabled: yes
+
+
+- name: Install and start PostgreSQL on db servers
+  hosts: database
+  become: true
+
+  tasks:
+    - name: Ensure postgresql is at the latest version
+      ansible.builtin.apt:
+        name: postgresql
         state: latest
-      when: ansible_distribution in ["Debian", "Ubuntu"] 
+        update_cache: yes
+
+    - name: Ensure that postgresql is started
+      ansible.builtin.systemd:
+        name: postgresql
+        state: started
+        enabled: yes
