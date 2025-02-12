@@ -1,0 +1,16 @@
+---
+
+ - name: install software
+   hosts: test
+   become: true
+   tasks:
+     - name: install software
+       apt:
+         name: "{{ item }}"
+         state: latest
+       when: ansible_os_family == 'Debian' and ansible_distribution == 'Ubuntu'    
+       loop:
+          - git
+          - docker.io
+          - python3
+          - openjdk-11-jdk

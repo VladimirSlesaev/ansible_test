@@ -15,10 +15,19 @@
         name: apache2
         state: started
         enabled: yes
+    
+    - name: Copy default html file for website
+      tags: apache, apache2, httpd
+      copy:
+        src: default_site.html  
+        dest: /var/www/html/index.html  
+        owner: root
+        group: root
+        mode: '0644'
 
 
 - name: Install and start PostgreSQL on db servers
-  hosts: database
+  hosts: databas
   become: true
 
   tasks:
@@ -33,3 +42,4 @@
         name: postgresql
         state: started
         enabled: yes
+

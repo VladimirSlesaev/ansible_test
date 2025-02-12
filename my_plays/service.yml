@@ -1,0 +1,42 @@
+ ---
+- name: Install Jenkins on Ubuntu
+  hosts: all
+  become: yes
+  tasks:
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install Java (required for Jenkins)
+      apt:
+        name: openjdk-11-jdk
+        state: present
+
+    - name: Add Jenkins repository
+      apt_repository:
+        repo: "deb http://pkg.jenkins.io/debian/ stable main"
+        state: present
+
+    - name: Add Jenkins key
+      apt_key:
+        url: "https://pkg.jenkins.io/debian/jenkins.io.key"
+        state: present
+
+    - name: Install Jenkins
+      apt:
+        name: jenkins
+        state: present
+
+    - name: Start Jenkins service
+      service:
+        name: jenkins
+        state: started
+        enabled: yes
+
+    - name: Open firewall for Jenkins (port 8080)
+      ufw:
+        rule: allow
+        name: 'Open Port 8080'
+        port: '8080'
+        proto: tcp
