@@ -9,21 +9,29 @@
       user:
         name: "{{ name }}"
         state: present  
+  
 
-- name: Install apache on RHEL server
+- name: Install and configure Apache
   hosts: webservers
-  become: true  # Ensure tasks run with sudo privileges
+  become: true
   tasks:
-    - name: Install the latest version of apache
-      yum:  
+    - name: Install Apache
+      yum:
         name: httpd
-        state: latest  # Install the latest version of Apache
-      when: ansible_facts['distribution'] in ['CentOS', 'RedHat']  # Use a broader check for CentOS and RHEL family systems
+        state: latest
+      when: ansible_facts['distribution'] in ['CentOS', 'RedHat']  # Use a broader check for CentOS and RHEL family systems  
       notify:
-        - Start Apache  # Notify handler to start Apache after installation
+        - Restart Apache  # Notify the handler to restart Apache if the package is installed
+
+    - name: Copy custom Apache config
+      copy:
+        src: /path/to/apache/config.conf
+        dest: /etc/httpd/conf/httpd.conf
+      notify:
+        - Restart Apache  # Notify the handler to restart Apache if the config is changed
 
   handlers:
-    - name: Start Apache
+    - name: Restart Apache
       service:
         name: httpd
-        state: started  # Start Apache service
+        state: restarted  # Restart the Apache service          
