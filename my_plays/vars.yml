@@ -1,0 +1,29 @@
+---
+- name: Example for using variables
+  hosts: test
+  become: true
+  vars:
+    name: john_doe  
+  tasks:
+    - name: Create user
+      user:
+        name: "{{ name }}"
+        state: present  
+
+- name: Install apache on RHEL server
+  hosts: webservers
+  become: true  # Ensure tasks run with sudo privileges
+  tasks:
+    - name: Install the latest version of apache
+      yum:  
+        name: httpd
+        state: latest  # Install the latest version of Apache
+      when: ansible_facts['distribution'] in ['CentOS', 'RedHat']  # Use a broader check for CentOS and RHEL family systems
+      notify:
+        - Start Apache  # Notify handler to start Apache after installation
+
+  handlers:
+    - name: Start Apache
+      service:
+        name: httpd
+        state: started  # Start Apache service
